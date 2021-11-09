@@ -1,0 +1,14 @@
+# ignore tmp and old stuff
+tmp/
+old/
+/test_data/
+
+/scripts/old
+
+# ignore irrelevant things
+/pippo*
+/.ipynb_checkpoints/
+/.idea
+
+# ignore heavy test data
+/test_data/test_bbox/
