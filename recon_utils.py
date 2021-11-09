@@ -31,16 +31,23 @@ import dxchange
 import tifffile
 import matplotlib.pyplot as plt
 
-def convert8bit(rec, data_min, data_max):
+def convert8bit(rec, data_min, data_max, numexpr=True):
     rec = rec.astype(np.float32, copy=False)
     df = np.float32(data_max-data_min)
     mn = np.float32(data_min)
-    scl = ne.evaluate('0.5+255*(rec-mn)/df', truediv=True)
-    ne.evaluate('where(scl<0,0,scl)', out=scl)
-    ne.evaluate('where(scl>255,255,scl)', out=scl)
-    return scl.astype(np.uint8)
 
-def touint8(data, range=None, quantiles=None):
+    if numexpr:
+        scl = ne.evaluate('0.5+255*(rec-mn)/df', truediv=True)
+        ne.evaluate('where(scl<0,0,scl)', out=scl)
+        ne.evaluate('where(scl>255,255,scl)', out=scl)
+        return scl.astype(np.uint8)
+    else:
+        rec = 0.5+255*(rec-mn)/df
+        rec[rec<0]=0
+        rec[rec>255]=255
+        return np.uint8(rec)
+
+def touint8(data, range=None, quantiles=None, numexpr=True):
     """Normalize and convert data to uint8.
 
         Parameters
@@ -51,6 +58,8 @@ def touint8(data, range=None, quantiles=None):
             Control range for data normalization.
         quantiles : [float, float]
             Define range for data normalization through input data quantiles. If range is given this input is ignored.
+        numexpr : bool
+            Use fast numerical expression evaluator for NumPy (memory expensive).
 
         Returns
         -------
@@ -65,17 +74,17 @@ def touint8(data, range=None, quantiles=None):
             data_min = np.nanmin(data)
             data_max = np.nanmax(data)
             data_max = data_max - data_min
-            return convert8bit(data, data_min, data_max)
+            return convert8bit(data, data_min, data_max, numexpr)
         else:
             [q0, q1] = np.quantile(np.ravel(data), quantiles)
-            return convert8bit(data, q0, q1)
+            return convert8bit(data, q0, q1, numexpr)
 
     else:
         # ignore quantiles input if given
         if quantiles is not None:
             print('quantiles input ignored.')
 
-        return convert8bit(data, range[0], range[1])
+        return convert8bit(data, range[0], range[1], numexpr)
 
 def to01(I):
     """Normalize data to 0-1 range.
