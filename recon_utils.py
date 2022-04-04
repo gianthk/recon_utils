@@ -152,12 +152,12 @@ def read_tiff_stack(filename):
     #     - check that folder contains only .TIFF files; skip the rest
 
     # search all files in parent folder; create filenames list
-    tifffiles = [os.path.join(os.path.dirname(filename), f) for f in os.listdir(os.path.dirname(filename))
+    stack_files = [os.path.join(os.path.dirname(filename), f) for f in os.listdir(os.path.dirname(filename))
                      if os.path.isfile(os.path.join(os.path.dirname(filename), f))]
-    tifffiles.sort()
+    stack_files.sort()
 
     # load stack using tifffile
-    return tifffile.imread(tifffiles)
+    return tifffile.imread(stack_files)
 
 def add_cap(data_3D, cap_thickness, cap_val):
     # Add caps of voxels with given GV to the input 3D data.
