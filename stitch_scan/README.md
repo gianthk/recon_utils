@@ -16,3 +16,14 @@ A gain factor can be multiplied to the stack slices.
 ```commandline
 python stitch_scan.py -h
 ```
+
+### Examples:
+* Process selected slices of a stitch scan applying a rigid image translation of 4 voxels along vertical axis:
+```commandline
+python stitch_scan.py "/path_input_stack/slice_0000.tif" "/path_output_stack/slice_0000.tif" -si 107 112 -so 30 --translate 0 -4
+```
+    
+* Copy and rename slices set applying a 20% Grey Value Gain:
+```commandline
+python stitch_scan.py "/path_input_stack/slice_0000.tif" "/path_output_stack/slice_0000.tif" -si 107 112 -so 30 -g 1.055 --verbose
+```
