@@ -69,6 +69,7 @@ def main():
     parser.add_argument('-so', '--sliceout', type=int, default=None, help='First slice number after stitching.')
     parser.add_argument('-a', '--affine', type=float, default=None, nargs='+', help='2D Affine transformation matrix components (a11, a12, atx, a21, a22, aty).')
     parser.add_argument('-t', '--translate', type=float, default=None, nargs='+', help='Translation (tx, ty) as array, list or tuple.')
+    parser.add_argument('--output_shape', type=int, default=None, nargs='+', help='Shape of the output transformed images. tuple (rows, cols), optional.')
     parser.add_argument('-g', '--gain', type=float, default=None, help='Apply gain to the stack Grey Values.')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='Verbose output.')
     parser.add_argument('--overwrite', dest='overwrite', action='store_true', help='Overwrite existing files.')
@@ -127,37 +128,58 @@ def main():
 
     if any(transformation != None for transformation in [args.affine, args.translate, args.gain]):
         import tifffile
+
+        if args.output_shape is not None:
+            tmp = tifffile.imread(stack_files[slices_in_id])
+            pad = args.output_shape - np.array(tmp.shape)
+            pad_b = np.ceil(pad/2).astype(int)
+            pad_a = pad - pad_b
+
         if args.gain is None:
             # AFFINE TRANSFORMATION #############################
             logging.info('Processing {} slices with given affine transformation..'.format(len(stack_files_out)))
-            for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
-                data = tifffile.imread(filename)
-                tf_data = transform.warp(data, tform_inverse)
-                tifffile.imwrite(stack_files_out[count], tf_data)
-                count = count + 1
+            if args.output_shape is not None:
+                # PADDING #############################
+                for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                    data = tifffile.imread(filename)
+                    tifffile.imwrite(stack_files_out[count], np.pad(transform.warp(data, tform_inverse), ((pad_b[0], pad_a[0]), (pad_b[1], pad_a[1]))))
+                    count = count + 1
+
+            else:
+                # NO PADDING #############################
+                for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                    data = tifffile.imread(filename)
+                    tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse))
+                    count = count + 1
 
         elif all(transformation == None for transformation in [args.affine, args.translate]):
             # GAIN #############################
             logging.info('Applying GV gain {1} to {0} slices..'.format(len(stack_files_out), args.gain))
             for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
                 data = tifffile.imread(filename)
-                # tf_data = transform.warp(data, tform_inverse)*args.gain
                 tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse) * args.gain)
                 count = count + 1
 
         else:
             # AFFINE TRANSFORMATION + GAIN #############################
             logging.info('Processing {0} slices with given affine transformation and GV gain: {1}..'.format(len(stack_files_out), args.gain))
-            for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
-                data = tifffile.imread(filename)
-                # tf_data = transform.warp(data, tform_inverse)*args.gain
-                tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse)*args.gain)
-                count = count + 1
+            if args.output_shape is not None:
+                # PADDING #############################
+                for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                    data = tifffile.imread(filename)
+                    tifffile.imwrite(stack_files_out[count], np.pad(transform.warp(data, tform_inverse)*args.gain, ((pad_b[0], pad_a[0]), (pad_b[1], pad_a[1]))))
+                    count = count + 1
+            else:
+                # NO PADDING #############################
+                for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                    data = tifffile.imread(filename)
+                    tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse)*args.gain)
+                    count = count + 1
     else:
         # COPY AND RENAME #############################
         logging.info('Copying and renaming {} slices..'.format(len(stack_files_out)))
         import shutil
-        for filename in stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]:
+        for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
             shutil.copy(filename, stack_files_out[count])
             count = count + 1
 

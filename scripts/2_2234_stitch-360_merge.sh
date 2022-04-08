@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Merge 2-stitch scan
+python stitch_scan/stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/2_2234_stitch2-360_Z0.0mm_corr_phrt/slices/slice_0000.tif" "/media/gianthk/My Passport/20217193_Traviglia/recons/2_2234_stitch2-360_merge_corr_phrt/slices/slice_0000.tif" -si 261 2047 -so 2048 -a 0.999997388302074 -0.002285473480922 2.182103556604507 0.002285473480922 0.999997388302074 -5.604462026002238 -g 1.09657 --output_shape 3880 3880 --verbose
