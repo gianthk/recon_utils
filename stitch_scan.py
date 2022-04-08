@@ -9,11 +9,11 @@ For more information, call this script with the help option:
 
 __author__ = ['Gianluca Iori']
 __date_created__ = '2022-04-04'
-__date__ = '2022-04-04'
+__date__ = '2022-04-07'
 __copyright__ = 'Copyright (c) 2022, JC|MSK'
 __docformat__ = 'restructuredtext en'
 __license__ = "GPL"
-__version__ = "0.1"
+__version__ = "0.2"
 __maintainer__ = 'Gianluca Iori'
 __email__ = "gianthk.iori@gmail.com"
 
@@ -36,6 +36,7 @@ def main():
                 
                 The script writes renamed copies of the selected range of slices to a given output folder.
                 A rigid 2D transformation (identical for all slices) can be applied.
+                A gain factor can be multiplied to the stack slices.
                 
                 For listing the script options type:
                     python stitch_scan.py -h 
