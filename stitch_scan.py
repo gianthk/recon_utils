@@ -28,18 +28,36 @@ import numpy as np
 
 def main():
     description = textwrap.dedent('''\
-                Merge stitch scan reconstructions.
+                Process stitch scan reconstructions.
+                
+                This script is used to rename and apply a 2D rigid transformation (affine or translate) to a specific set of slices
+                from a stitch scan reconstruction. Stitch scans are subsequent scans of a sample that is displaced vertically between scans.
+                The scan overlap and (optional) rigid transformation aligning two subsequent scans must be claculated before running this script.
+                
+                The script writes renamed copies of the selected range of slices to a given output folder.
+                A rigid 2D transformation (identical for all slices) can be applied.
+                
+                For listing the script options type:
+                    python stitch_scan.py -h 
                 ''')
     epilog = textwrap.dedent('''\
                 EXAMPLES:
-                * Merge stitch scan reconstructions:
+                * Process selected slices of a stitch scan applying a rigid image translation of 4 voxels along vertical axis:
 
-                    stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z0.0mm_corr_phrt_EL/slices/slice_0000.tif"
+                    python stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z0.0mm_corr_phrt_EL/slices/slice_0000.tif"
                     "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z0.0mm_corr_phrt_EL/slices_transform/slice_0000.tif"
                     -si 107 112
                     -so 30
-                    --translate 20 20
-                    --overwrite
+                    --translate 0 -4
+                    
+                * Copy and rename slices set applying a 20% Grey Value Gain:
+
+                    python stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z0.0mm_corr_phrt_EL/slices/slice_0000.tif"
+                    "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z0.0mm_corr_phrt_EL/slices_transform/slice_0000.tif"
+                    -si 107 112
+                    -so 30
+                    -g 1.055
+                    --verbose
                 ''')
 
     parser = argparse.ArgumentParser(description=description, epilog=epilog,
@@ -50,6 +68,7 @@ def main():
     parser.add_argument('-so', '--sliceout', type=int, default=None, help='First slice number after stitching.')
     parser.add_argument('-a', '--affine', type=float, default=None, nargs='+', help='2D Affine transformation matrix components (a11, a12, atx, a21, a22, aty).')
     parser.add_argument('-t', '--translate', type=float, default=None, nargs='+', help='Translation (tx, ty) as array, list or tuple.')
+    parser.add_argument('-g', '--gain', type=float, default=None, help='Apply gain to the stack Grey Values.')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='Verbose output.')
     parser.add_argument('--overwrite', dest='overwrite', action='store_true', help='Overwrite existing files.')
     parser.set_defaults(verbose=False, overwrite=False)
@@ -103,14 +122,39 @@ def main():
 
     # transform and write stack of slices with stitched slice IDs
     count = 0
-    if any(transformation != None for transformation in [args.affine, args.translate]):
+    logging.info('First slice: {}'.format(stack_files[slices_in_id]))
+
+    if any(transformation != None for transformation in [args.affine, args.translate, args.gain]):
         import tifffile
-        for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
-            data = tifffile.imread(filename)
-            tf_data = transform.warp(data, tform_inverse)
-            tifffile.imwrite(stack_files_out[count], tf_data)
-            count = count + 1
+        if args.gain is None:
+            # AFFINE TRANSFORMATION #############################
+            logging.info('Processing {} slices with given affine transformation..'.format(len(stack_files_out)))
+            for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                data = tifffile.imread(filename)
+                tf_data = transform.warp(data, tform_inverse)
+                tifffile.imwrite(stack_files_out[count], tf_data)
+                count = count + 1
+
+        elif all(transformation == None for transformation in [args.affine, args.translate]):
+            # GAIN #############################
+            logging.info('Applying GV gain {1} to {0} slices..'.format(len(stack_files_out), args.gain))
+            for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                data = tifffile.imread(filename)
+                # tf_data = transform.warp(data, tform_inverse)*args.gain
+                tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse) * args.gain)
+                count = count + 1
+
+        else:
+            # AFFINE TRANSFORMATION + GAIN #############################
+            logging.info('Processing {0} slices with given affine transformation and GV gain: {1}..'.format(len(stack_files_out), args.gain))
+            for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
+                data = tifffile.imread(filename)
+                # tf_data = transform.warp(data, tform_inverse)*args.gain
+                tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse)*args.gain)
+                count = count + 1
     else:
+        # COPY AND RENAME #############################
+        logging.info('Copying and renaming {} slices..'.format(len(stack_files_out)))
         import shutil
         for filename in stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]:
             shutil.copy(filename, stack_files_out[count])

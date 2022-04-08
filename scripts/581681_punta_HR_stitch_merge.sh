@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Merge 4-stitch scan
+python stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z5.7mm_corr_phrt/slices/slice_0000.tif" "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_merge_corr_phrt/slices/slice_0000.tif" -si 0 1934 -so 0 -t 0 0.64 -g 1.115 --verbose
+python stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z3.8mm_corr_phrt/slices/slice_0000.tif" "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_merge_corr_phrt/slices/slice_0000.tif" -si 0 1936 -so 1935 -t -2 -2.64 -g 1.057 --verbose
+python stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z1.9mm_corr_phrt/slices/slice_0000.tif" "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_merge_corr_phrt/slices/slice_0000.tif" -si 0 2047 -so 3872 --verbose
+python stitch_scan.py "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_Z0.0mm_corr_phrt_EL/slices/slice_0000.tif" "/media/gianthk/My Passport/20217193_Traviglia/recons/581681_punta_HR_stitch2_merge_corr_phrt/slices/slice_0000.tif" -si 108 2047 -so 5920 -t 0 3.8 -g 1.979 --verbose
