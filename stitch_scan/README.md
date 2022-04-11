@@ -1,7 +1,7 @@
 # stitch_scan
 Process stitch scan reconstructions.
 
-![](stitch_scan_diagram.jpg)
+![](stitch_scan_diagram.png)
 
 This script is used to rename and apply a 2D rigid transformation (affine or translate) to a specific set of slices
 from a stitch scan reconstruction. Stitch scans are subsequent scans of a sample that is displaced vertically between scans.
