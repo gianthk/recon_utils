@@ -164,7 +164,11 @@ def main():
     summary_table_1 = df_selected.to_html().replace('<table border="1" class="dataframe">', '<table class="table table-striped">')  # use bootstrap styling
 
     # load template report string
-    html_string = read_report_template(args.template)
+    if args.template is None:
+        html_string = basic_report()
+    else:
+        html_string = read_report_template(args.template)
+        html_string = html_string.replace("web-Beats-logo.jpg", os.path.split(args.template)[0] + "/web-Beats-logo.jpg")
 
     # insert report title
     html_string = html_string.replace("Title", os.path.splitext(os.path.basename(args.filein))[0])
