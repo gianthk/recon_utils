@@ -24,7 +24,6 @@ __maintainer__ = 'Gianluca Iori'
 __email__ = "gianthk.iori@gmail.com"
 
 import numpy as np
-import numexpr as ne
 import png
 import os
 import dxchange
@@ -37,6 +36,8 @@ def convert8bit(rec, data_min, data_max, numexpr=True):
     mn = np.float32(data_min)
 
     if numexpr:
+        import numexpr as ne
+
         scl = ne.evaluate('0.5+255*(rec-mn)/df', truediv=True)
         ne.evaluate('where(scl<0,0,scl)', out=scl)
         ne.evaluate('where(scl>255,255,scl)', out=scl)
@@ -99,6 +100,7 @@ def to01(I):
     I : float32
         Normalized data.
     """
+    import numexpr as ne
 
     I = I.astype(np.float32, copy=False)
     data_min = np.nanmin(I)
@@ -145,16 +147,39 @@ def plot_midplanes(data_3D, slice_x=-1, slice_y=-1, slice_z=-1):
     ax2.imshow(data_3D[:, slice_x, :])
     ax3.imshow(data_3D[:, :, slice_y])
 
-def read_tiff_stack(filename):
-    # Read a stack of tiffs from single slice filename.
-    # Searches all files in parent folder and opens them as a stack of images.
-    # TO DO:
-    #     - check that folder contains only .TIFF files; skip the rest
+def read_tiff_stack(filename, range=None, zfill=4):
+    """Read stack of tiff files. Searches all files in parent folder and opens them as a stack of images.
+
+    Parameters
+    ----------
+    filename
+        One of the stack images.
+    range : [int, int]
+        Control load slices range.
+    zfill : int
+        Number of leading zeros in file names.
+
+    TO DO:
+    ----------
+    - select slices range
+    - check that folder contains only .TIFF files; skip the rest
+    """
 
     # search all files in parent folder; create filenames list
     stack_files = [os.path.join(os.path.dirname(filename), f) for f in os.listdir(os.path.dirname(filename))
                      if os.path.isfile(os.path.join(os.path.dirname(filename), f))]
     stack_files.sort()
+
+    if range is not None:
+        import re
+        slice_in = [i for i, item in enumerate(stack_files) if re.search(str(range[0]).zfill(4) + ".", item)]
+        slice_end = [i for i, item in enumerate(stack_files) if re.search(str(range[1]).zfill(4) + ".", item)]
+
+        if len(slice_in) == 1 and len(slice_end) == 1:
+            stack_files = stack_files[slice_in[0]:slice_end[0]]
+        else:
+            import warnings
+            warnings.warn('Given slice range is ambiguous or non existing.. loading whole stack.')
 
     # load stack using tifffile
     return tifffile.imread(stack_files)
