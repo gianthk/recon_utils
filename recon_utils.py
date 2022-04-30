@@ -15,11 +15,11 @@ Tomographic reconstruction image processing utilities.
 
 __author__ = 'Gianluca Iori'
 __date_created__ = '2021-03-28'
-__date__ = '2021-11-09'
+__date__ = '2022-04-30'
 __copyright__ = 'Copyright (c) 2021, JC|MSK'
 __docformat__ = 'restructuredtext en'
 __license__ = "MIT"
-__version__ = "1.1"
+__version__ = "1.2"
 __maintainer__ = 'Gianluca Iori'
 __email__ = "gianthk.iori@gmail.com"
 
@@ -161,7 +161,6 @@ def read_tiff_stack(filename, range=None, zfill=4):
 
     TO DO:
     ----------
-    - select slices range
     - check that folder contains only .TIFF files; skip the rest
     """
 
@@ -183,13 +182,6 @@ def read_tiff_stack(filename, range=None, zfill=4):
 
     # load stack using tifffile
     return tifffile.imread(stack_files)
-
-def add_cap(data_3D, cap_thickness, cap_val):
-    # Add caps of voxels with given GV to the input 3D data.
-    # Caps are added on both ends along the Z-direction (first dataset dimension).
-    data_3D_cap = np.ones([data_3D.shape[0]+2*cap_thickness, data_3D.shape[1], data_3D.shape[2]], data_3D.dtype)*cap_val
-    data_3D_cap[cap_thickness:-cap_thickness, :, :] = data_3D
-    return data_3D_cap
 
 def bbox(bw, offset=0, dsize=None, verbose=None):
     """Bounding BOX limits of input binary image.
