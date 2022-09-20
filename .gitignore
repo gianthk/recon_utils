@@ -12,3 +12,5 @@ old/
 
 # ignore heavy test data
 /test_data/test_bbox/
+/scripts/581681_punta_HR_stitch_merge_test.sh
+*.ipynb
