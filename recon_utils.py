@@ -22,31 +22,59 @@ import dxchange
 import tifffile
 import matplotlib.pyplot as plt
 
-def touint8(data_3D, range=None, quantiles=None, numexpr=True):
-    """Normalize and convert data to uint8.
+def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, subset=True):
+    """Normalize and convert data to unsigned integer.
 
     Parameters
     ----------
     data_3D
         Input data.
+    dtype
+        Output data type ('uint8' or 'uint16').
     range : [float, float]
         Control range for data normalization.
     quantiles : [float, float]
         Define range for data normalization through input data quantiles. If range is given this input is ignored.
     numexpr : bool
         Use fast numerical expression evaluator for NumPy (memory expensive).
+    subset : bool
+        Use subset of the input data for quantile calculation.
 
     Returns
     -------
-    output : uint8
+    output : uint
         Normalized data.
     """
 
+    def convertfloat():
+        return data_3D.astype(np.float32, copy=False), np.float32(data_max - data_min), np.float32(data_min)
+
+    def convertint():
+        if dtype == 'uint8':
+            return convert8bit()
+        elif dtype == 'uint16':
+            return convert16bit()
+
+    def convert16bit():
+
+        data_3D_float, df, mn = convertfloat()
+
+        if numexpr:
+            import numexpr as ne
+
+            scl = ne.evaluate('0.5+65535*(data_3D_float-mn)/df', truediv=True)
+            ne.evaluate('where(scl<0,0,scl)', out=scl)
+            ne.evaluate('where(scl>65535,65535,scl)', out=scl)
+            return scl.astype(np.uint16)
+        else:
+            data_3D_float = 0.5 + 65535 * (data_3D_float - mn) / df
+            data_3D_float[data_3D_float < 0] = 0
+            data_3D_float[data_3D_float > 65535] = 65535
+            return np.uint16(data_3D_float)
+
     def convert8bit():
 
-        data_3D_float = data_3D.astype(np.float32, copy=False)
-        df = np.float32(data_max - data_min)
-        mn = np.float32(data_min)
+        data_3D_float, df, mn = convertfloat()
 
         if numexpr:
             import numexpr as ne
@@ -68,10 +96,14 @@ def touint8(data_3D, range=None, quantiles=None, numexpr=True):
             data_min = np.nanmin(data_3D)
             data_max = np.nanmax(data_3D)
             data_max = data_max - data_min
-            return convert8bit()
+            return convertint()
         else:
-            [data_min, data_max] = np.quantile(np.ravel(data_3D), quantiles)
-            return convert8bit()
+            if subset:
+                [data_min, data_max] = np.quantile(np.ravel(data_3D[0::10, 0::10, 0::10]), quantiles)
+            else:
+                [data_min, data_max] = np.quantile(np.ravel(data_3D), quantiles)
+
+            return convertint()
 
     else:
         # ignore quantiles input if given
@@ -80,7 +112,7 @@ def touint8(data_3D, range=None, quantiles=None, numexpr=True):
 
         data_min = range[0]
         data_max = range[1]
-        return convert8bit()
+        return convertint()
 
 def to01(data_3D):
     """Normalize data to 0-1 range.
@@ -175,7 +207,7 @@ def writemidplanesDxchange(data_3D, fileout, slice_x=-1, slice_y=-1, slice_z=-1)
         filename, ext = os.path.splitext(fileout)
         dxchange.writer.write_tiff(touint8(data_3D[int(slice_z), :, :]), fname=filename+'_XY.tiff', dtype='uint8')
         dxchange.writer.write_tiff(touint8(data_3D[:, int(slice_y), :]), fname=filename + '_XZ.tiff', dtype='uint8')
-        dxchange.writer.write_tiff(touint8(data_3D[:, :, int(slice_x)]), fname=filename + '_YZ.tiff', dype='uint8')
+        dxchange.writer.write_tiff(touint8(data_3D[:, :, int(slice_x)]), fname=filename + '_YZ.tiff', dtype='uint8')
 
 def plot_midplanes(data_3D, slice_x=-1, slice_y=-1, slice_z=-1):
     """Plot orthogonal cross-sections through 3D dataset.
