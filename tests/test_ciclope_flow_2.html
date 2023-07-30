@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <style>
+        body{ margin:0 100; background:whitesmoke; }
+        /* Three image containers (use 25% for four, and 50% for two, etc) */
+        .column {
+          float: left;
+          width: 33.33%;
+          padding: 5px;
+        }
+
+        /* Clear floats after image containers */
+        .row::after {
+          content: "";
+          clear: both;
+          display: table;
+        }
+
+        .header img {
+          float: right;
+          width: 100px;
+          height: 100px;
+          background: #555;
+        }
+
+        .header h1 {
+          position: relative;
+        }
+        </style>
+    <meta charset="UTF-8">
+    <title>test_ciclope_flow_2</title>
+</head>
+<body>
+    <div class="header">
+        <img src="/home/gianthk/PycharmProjects/recon_utils/reporting/web-Beats-logo.jpg" alt="BEATS logo" />
+        <h1>Reconstruction report - test_ciclope_flow_2</h1>
+    </div>
+    <!-- *** Master table *** --->
+    <h2>Study summary</h2>
+    <table class="table table-striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>run</th>
+      <th>filein</th>
+      <th>fileout</th>
+      <th>vs</th>
+      <th>smooth</th>
+      <th>r</th>
+      <th>t</th>
+      <th>cap_t</th>
+      <th>cap_val</th>
+      <th>template</th>
+      <th>midplanes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025/B_matrix_01_0000.tif</td>
+      <td>ciclope_flow4.inp</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>90</td>
+      <td>0</td>
+      <td>0</td>
+      <td>/home/gianthk/PycharmProjects/CT2FE/input_templates/tmp_example01_tens_static_bone.inp</td>
+      <td>/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025_XY.png</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00/1000_B_360_01__0000.tif</td>
+      <td>ciclope_flow6.inp</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>5</td>
+      <td>120</td>
+      <td>0</td>
+      <td>0</td>
+      <td>/home/gianthk/PycharmProjects/CT2FE/input_templates/tmp_example01_comp_static_bone.inp</td>
+      <td>/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00_XY.png</td>
+    </tr>
+  </tbody>
+</table>
+    <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+    <h2>Reconstructions</h2>
+    <table class="table table-striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>run</th>
+      <th>filein</th>
+      <th>fileout</th>
+      <th>vs</th>
+      <th>smooth</th>
+      <th>r</th>
+      <th>t</th>
+      <th>cap_t</th>
+      <th>cap_val</th>
+      <th>template</th>
+      <th>midplanes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025/B_matrix_01_0000.tif</td>
+      <td>ciclope_flow4.inp</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>90</td>
+      <td>0</td>
+      <td>0</td>
+      <td>/home/gianthk/PycharmProjects/CT2FE/input_templates/tmp_example01_tens_static_bone.inp</td>
+      <td>/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025_XY.png</td>
+    </tr>
+  </tbody>
+</table>
+    <div class="row">
+      <div class="column">
+        <img src="/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025_XY.png" alt="XY plane" style="width:100%">
+      </div>
+      <div class="column">
+        <img src="/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025_XZ.png" alt="XZ plane" style="width:100%">
+      </div>
+      <div class="column">
+        <img src="/home/gianthk/Data/TOMCAT/Kaya/B_matrix_01_/rec_8bit_0_rescale_025_YZ.png" alt="YZ plane" style="width:100%">
+      </div>
+    </div>
+    <table class="table table-striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>run</th>
+      <th>filein</th>
+      <th>fileout</th>
+      <th>vs</th>
+      <th>smooth</th>
+      <th>r</th>
+      <th>t</th>
+      <th>cap_t</th>
+      <th>cap_val</th>
+      <th>template</th>
+      <th>midplanes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00/1000_B_360_01__0000.tif</td>
+      <td>ciclope_flow6.inp</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>5</td>
+      <td>120</td>
+      <td>0</td>
+      <td>0</td>
+      <td>/home/gianthk/PycharmProjects/CT2FE/input_templates/tmp_example01_comp_static_bone.inp</td>
+      <td>/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00_XY.png</td>
+    </tr>
+  </tbody>
+</table>
+    <div class="row">
+      <div class="column">
+        <img src="/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00_XY.png" alt="XY plane" style="width:100%">
+      </div>
+      <div class="column">
+        <img src="/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00_XZ.png" alt="XZ plane" style="width:100%">
+      </div>
+      <div class="column">
+        <img src="/home/gianthk/Data/TOMCAT/Manfrini/1000_B_360_01_/cropped_rescale_025_00_YZ.png" alt="YZ plane" style="width:100%">
+      </div>
+    </div>
+    
+</body>
+</html>
