@@ -167,15 +167,15 @@ def writemidplanes(data_3D, fileout, slice_x=-1, slice_y=-1, slice_z=-1):
         filename, ext = os.path.splitext(fileout)
         with open(filename + '_XY.png', 'wb') as midplaneXY:
             pngWriter = png.Writer(data_3D.shape[2], data_3D.shape[1], greyscale=True, alpha=False, bitdepth=8)
-            pngWriter.write(midplaneXY, touint8(data_3D[int(slice_z), :, :]))
+            pngWriter.write(midplaneXY, touint(data_3D[int(slice_z), :, :]))
 
         with open(filename + '_XZ.png', 'wb') as midplaneXZ:
             pngWriter = png.Writer(data_3D.shape[2], data_3D.shape[0], greyscale=True, alpha=False, bitdepth=8)
-            pngWriter.write(midplaneXZ, touint8(data_3D[:, int(slice_y), :]))
+            pngWriter.write(midplaneXZ, touint(data_3D[:, int(slice_y), :]))
 
         with open(filename + '_YZ.png', 'wb') as midplaneYZ:
             pngWriter = png.Writer(data_3D.shape[1], data_3D.shape[0], greyscale=True, alpha=False, bitdepth=8)
-            pngWriter.write(midplaneYZ, touint8(data_3D[:, :, int(slice_x)]))
+            pngWriter.write(midplaneYZ, touint(data_3D[:, :, int(slice_x)]))
 
 def writemidplanesDxchange(data_3D, fileout, slice_x=-1, slice_y=-1, slice_z=-1):
     """Plot orthogonal mid-planes through 3D dataset and save them as images.
@@ -205,9 +205,9 @@ def writemidplanesDxchange(data_3D, fileout, slice_x=-1, slice_y=-1, slice_z=-1)
             slice_z = int(data_3D.shape[0] / 2)
 
         filename, ext = os.path.splitext(fileout)
-        dxchange.writer.write_tiff(touint8(data_3D[int(slice_z), :, :]), fname=filename+'_XY.tiff', dtype='uint8')
-        dxchange.writer.write_tiff(touint8(data_3D[:, int(slice_y), :]), fname=filename + '_XZ.tiff', dtype='uint8')
-        dxchange.writer.write_tiff(touint8(data_3D[:, :, int(slice_x)]), fname=filename + '_YZ.tiff', dtype='uint8')
+        dxchange.writer.write_tiff(touint(data_3D[int(slice_z), :, :]), fname=filename+'_XY.tiff', dtype='uint8')
+        dxchange.writer.write_tiff(touint(data_3D[:, int(slice_y), :]), fname=filename + '_XZ.tiff', dtype='uint8')
+        dxchange.writer.write_tiff(touint(data_3D[:, :, int(slice_x)]), fname=filename + '_YZ.tiff', dtype='uint8')
 
 def plot_midplanes(data_3D, slice_x=-1, slice_y=-1, slice_z=-1):
     """Plot orthogonal cross-sections through 3D dataset.
