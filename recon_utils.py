@@ -7,8 +7,8 @@ MicroCT image processing utilities.
 
 __author__ = 'Gianluca Iori'
 __date_created__ = '2021-03-28'
-__date__ = '2022-08-08'
-__copyright__ = 'Copyright (c) 2022, ORMIR'
+__date__ = '2024-02-25'
+__copyright__ = 'Copyright (c) 2025, SESAME'
 __docformat__ = 'restructuredtext en'
 __license__ = "MIT"
 __version__ = "1.3"
@@ -56,21 +56,22 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
             return convert16bit()
 
     def convert16bit():
-
-        data_3D_float, df, mn = convertfloat()
+        print('here 0')
+        data_3D, df, mn = convertfloat()
+        print('here 1')
 
         if numexpr:
             import numexpr as ne
 
-            scl = ne.evaluate('0.5+65535*(data_3D_float-mn)/df', truediv=True)
+            scl = ne.evaluate('0.5+65535*(data_3D-mn)/df', truediv=True)
             ne.evaluate('where(scl<0,0,scl)', out=scl)
             ne.evaluate('where(scl>65535,65535,scl)', out=scl)
             return scl.astype(np.uint16)
         else:
-            data_3D_float = 0.5 + 65535 * (data_3D_float - mn) / df
-            data_3D_float[data_3D_float < 0] = 0
-            data_3D_float[data_3D_float > 65535] = 65535
-            return np.uint16(data_3D_float)
+            data_3D = 0.5 + 65535 * (data_3D - mn) / df
+            data_3D[data_3D < 0] = 0
+            data_3D[data_3D > 65535] = 65535
+            return np.uint16(data_3D)
 
     def convert8bit():
 
