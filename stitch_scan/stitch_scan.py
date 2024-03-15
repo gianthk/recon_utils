@@ -18,6 +18,7 @@ __maintainer__ = 'Gianluca Iori'
 __email__ = "gianthk.iori@gmail.com"
 
 import os
+import re
 import argparse
 import logging
 from tqdm import tqdm
@@ -89,7 +90,7 @@ def main():
     stack_files.sort()
 
     # list of slices IDs
-    slice_ids = [int(filename[-8:-4]) for filename in stack_files]
+    slice_ids = [int(re.sub("[^0-9]", "", os.path.splitext(os.path.basename(filename))[0])) for filename in stack_files]
 
     # ID of the first slice to process
     slices_in_id = slice_ids.index(args.slicesin[0])
@@ -149,7 +150,7 @@ def main():
                 # NO PADDING #############################
                 for filename in tqdm(stack_files[slices_in_id:(slices_in_id + args.slicesin[1] - args.slicesin[0] + 1):1]):
                     data = tifffile.imread(filename)
-                    tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse))
+                    tifffile.imwrite(stack_files_out[count], transform.warp(data, tform_inverse, preserve_range=True).astype('uint8'), imagej=True)
                     count = count + 1
 
         elif all(transformation == None for transformation in [args.affine, args.translate]):
