@@ -18,10 +18,18 @@ __email__ = "gianthk.iori@gmail.com"
 import numpy as np
 import png
 import os
-import dxchange
 import logging
-import tifffile
 import matplotlib.pyplot as plt
+
+try:
+    import dxchange
+except ImportError:
+    logging.debug('dxchange failed to import', exc_info=True)
+
+try:
+    import tifffile
+except ImportError:
+    logging.debug('tifffile failed to import', exc_info=True)
 
 def average_sinogram_by_interval(_projs, slicer=1, remove_last_n_to_make_suited_size_for_reshape='auto'):
 	"""
