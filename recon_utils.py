@@ -7,8 +7,8 @@ Computed tomography image processing utilities.
 
 __author__ = 'Gianluca Iori'
 __date_created__ = '2021-03-28'
-__date__ = '2024-02-28'
-__copyright__ = 'Copyright (c) 2025, SESAME'
+__date__ = '2024-04-09'
+__copyright__ = 'Copyright (c) 2024, SESAME'
 __docformat__ = 'restructuredtext en'
 __license__ = "MIT"
 __version__ = "1.3"
