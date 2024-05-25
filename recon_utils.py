@@ -7,8 +7,8 @@ Computed tomography image processing utilities.
 
 __author__ = 'Gianluca Iori'
 __date_created__ = '2021-03-28'
-__date__ = '2024-02-28'
-__copyright__ = 'Copyright (c) 2025, SESAME'
+__date__ = '2024-05-25'
+__copyright__ = 'Copyright (c) 2024, SESAME'
 __docformat__ = 'restructuredtext en'
 __license__ = "MIT"
 __version__ = "1.3"
@@ -47,7 +47,7 @@ def average_sinogram_by_interval(_projs, slicer=1, remove_last_n_to_make_suited_
 
 	return array_reduced_by_averaging
 
-def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, subset=True, nchunk=None):
+def touint(data_3D, dtype='uint8', data_range=None, quantiles=None, numexpr=True, subset=True, nchunk=None):
     """Normalize and convert data to unsigned integer.
 
     Parameters
@@ -56,10 +56,10 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
         Input data.
     dtype
         Output data type ('uint8' or 'uint16').
-    range : [float, float]
+    data_range : [float, float]
         Control range for data normalization.
     quantiles : [float, float]
-        Define range for data normalization through input data quantiles. If range is given this input is ignored.
+        Define range for data normalization through input data quantiles. If data_range is given this input is ignored.
     numexpr : bool
         Use fast numerical expression evaluator for NumPy (memory expensive).
     subset : bool
@@ -78,6 +78,7 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
         if nchunk is not None:
 
             data_int = np.zeros(data_3D.shape, dtype=dtype)
+
             slcs = [np.s_[offset:offset + nchunk] for offset in range(0, data_3D.shape[0], nchunk)]
             for slices in slcs:
                 if dtype == 'uint8':
@@ -92,15 +93,12 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
             return convert16bit(data_3D)
 
     def convert16bit(data_3D):
-        logging.info('here 0')
         data_3D, df, mn = convertfloat(data_3D)
-        logging.info('here 1')
 
         if numexpr:
             import numexpr as ne
 
             scl = ne.evaluate('0.5+65535*(data_3D-mn)/df', truediv=True)
-            logging.info('here 2')
             ne.evaluate('where(scl<0,0,scl)', out=scl)
             ne.evaluate('where(scl>65535,65535,scl)', out=scl)
             return scl.astype(np.uint16)
@@ -127,7 +125,7 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
             data_3D_float[data_3D > 255] = 255
             return np.uint8(data_3D)
 
-    if range == None:
+    if data_range == None:
 
         # if quantiles is empty data is scaled based on its min and max values
         if quantiles == None:
@@ -148,8 +146,8 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
         if quantiles is not None:
             print('quantiles input ignored.')
 
-        data_min = range[0]
-        data_max = range[1]
+        data_min = data_range[0]
+        data_max = data_range[1]
         return convertint(data_3D, nchunk)
 
 def to01(data_3D):
@@ -296,15 +294,15 @@ def plot_projections(data_3D, projection='max'):
         ax2.imshow(np.min(data_3D, 1))
         ax3.imshow(np.min(data_3D, 2))
 
-def read_tiff_stack(filename, range=None, zfill=4):
+def read_tiff_stack(filename, slice_range=None, zfill=4):
     """Read stack of tiff files. Searches all files in parent folder and opens them as a stack of images.
 
     Parameters
     ----------
     filename
         One of the stack images.
-    range : [int, int]
-        Control load slices range.
+    slice_range : [int, int]
+        Control load slices slice_range.
     zfill : int
         Number of leading zeros in file names.
 
@@ -318,10 +316,10 @@ def read_tiff_stack(filename, range=None, zfill=4):
                      if os.path.isfile(os.path.join(os.path.dirname(filename), f))]
     stack_files.sort()
 
-    if range is not None:
+    if slice_range is not None:
         import re
-        slice_in = [i for i, item in enumerate(stack_files) if re.search(str(range[0]).zfill(4) + ".", item)]
-        slice_end = [i for i, item in enumerate(stack_files) if re.search(str(range[1]).zfill(4) + ".", item)]
+        slice_in = [i for i, item in enumerate(stack_files) if re.search(str(slice_range[0]).zfill(4) + ".", item)]
+        slice_end = [i for i, item in enumerate(stack_files) if re.search(str(slice_range[1]).zfill(4) + ".", item)]
 
         if len(slice_in) == 1 and len(slice_end) == 1:
             stack_files = stack_files[slice_in[0]:slice_end[0]]
