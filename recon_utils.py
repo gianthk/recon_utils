@@ -7,11 +7,11 @@ Computed tomography image processing utilities.
 
 __author__ = 'Gianluca Iori'
 __date_created__ = '2021-03-28'
-__date__ = '2024-04-09'
+__date__ = '2024-04-26'
 __copyright__ = 'Copyright (c) 2024, SESAME'
 __docformat__ = 'restructuredtext en'
 __license__ = "MIT"
-__version__ = "1.3"
+__version__ = "1.4"
 __maintainer__ = 'Gianluca Iori'
 __email__ = "gianthk.iori@gmail.com"
 
@@ -55,7 +55,7 @@ def average_sinogram_by_interval(_projs, slicer=1, remove_last_n_to_make_suited_
 
 	return array_reduced_by_averaging
 
-def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, subset=True, nchunk=None):
+def touint(data_3D, dtype='uint8', data_range=None, quantiles=None, numexpr=True, subset=True, nchunk=None):
     """Normalize and convert data to unsigned integer.
 
     Parameters
@@ -64,10 +64,10 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
         Input data.
     dtype
         Output data type ('uint8' or 'uint16').
-    range : [float, float]
-        Control range for data normalization.
+    data_range : [float, float]
+        Control data range for data normalization.
     quantiles : [float, float]
-        Define range for data normalization through input data quantiles. If range is given this input is ignored.
+        Define data range for data normalization through input data quantiles. If data_range is given this input is ignored.
     numexpr : bool
         Use fast numerical expression evaluator for NumPy (memory expensive).
     subset : bool
@@ -135,7 +135,7 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
             data_3D_float[data_3D > 255] = 255
             return np.uint8(data_3D)
 
-    if range == None:
+    if data_range == None:
 
         # if quantiles is empty data is scaled based on its min and max values
         if quantiles == None:
@@ -156,8 +156,8 @@ def touint(data_3D, dtype='uint8', range=None, quantiles=None, numexpr=True, sub
         if quantiles is not None:
             print('quantiles input ignored.')
 
-        data_min = range[0]
-        data_max = range[1]
+        data_min = data_range[0]
+        data_max = data_range[1]
         return convertint(data_3D, nchunk)
 
 def to01(data_3D):
