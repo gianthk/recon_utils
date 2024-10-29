@@ -453,7 +453,7 @@ def write_jpeg2000_stack(
         if True, overwrites the existing file if the file exists.
     """
 
-    fname, data = dxchange.writer._init_write(data, fname, ".tiff", dtype, True)
+    fname, data = dxchange.writer._init_write(data, fname, ".jp2", dtype, True)
     body = dxchange.writer.get_body(fname)
     ext = dxchange.writer.get_extension(fname)
     _data = np.swapaxes(data, 0, axis)
