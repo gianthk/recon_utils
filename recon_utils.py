@@ -463,7 +463,9 @@ def write_jpeg2000_stack(
             _fname = dxchange.writer._suggest_new_fname(_fname, digit=1)
 
         glymur.set_option("lib.num_threads", nthreads)
-        _data[m - start] = glymur.Jp2k(_fname, data=data)
+        print(_fname)
+        print()
+        j = glymur.Jp2k(_fname, data=_data[m - start])
         # write_tiff(_data[m - start], _fname, overwrite=overwrite)
 
 
