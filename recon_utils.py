@@ -428,8 +428,9 @@ def write_jpeg2000_stack(
     axis=0,
     digit=5,
     start=0,
-    overwrite=False,
     nthreads=1,
+    compratio=10,
+    overwrite=False,
 ):
     """
     Write data to stack of JPEG2000 files using glymur. Inspired by dxchange.write_tiff_stack
@@ -449,6 +450,10 @@ def write_jpeg2000_stack(
         First index of file in stack for saving.
     digit : int, optional
         Number of digits in indexing stacked files.
+    nthreads : int, optional
+        Number of threads for parallel write.
+    compratio : int, optional
+        Compression ratio.
     overwrite: bool, optional
         if True, overwrites the existing file if the file exists.
     """
@@ -463,7 +468,7 @@ def write_jpeg2000_stack(
             _fname = dxchange.writer._suggest_new_fname(_fname, digit=1)
 
         glymur.set_option("lib.num_threads", nthreads)
-        j = glymur.Jp2k(_fname, data=_data[m - start], cratios=[10])
+        glymur.Jp2k(_fname, data=_data[m - start], cratios=[compratio])
         # write_tiff(_data[m - start], _fname, overwrite=overwrite)
 
 
