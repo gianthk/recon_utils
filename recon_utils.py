@@ -129,15 +129,12 @@ def touint(
             return convert16bit(data_3D)
 
     def convert16bit(data_3D):
-        logging.info("here 0")
         data_3D, df, mn = convertfloat(data_3D)
-        logging.info("here 1")
 
         if numexpr:
             import numexpr as ne
 
             scl = ne.evaluate("0.5+65535*(data_3D-mn)/df", truediv=True)
-            logging.info("here 2")
             ne.evaluate("where(scl<0,0,scl)", out=scl)
             ne.evaluate("where(scl>65535,65535,scl)", out=scl)
             return scl.astype(np.uint16)
