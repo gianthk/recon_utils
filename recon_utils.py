@@ -466,7 +466,6 @@ def write_jpeg2000_stack(
 
         glymur.set_option("lib.num_threads", nthreads)
         glymur.Jp2k(_fname, data=_data[m - start], cratios=[compratio])
-        # write_tiff(_data[m - start], _fname, overwrite=overwrite)
 
 
 def bbox(bw, pad=0, dsize=None, verbose=None):
