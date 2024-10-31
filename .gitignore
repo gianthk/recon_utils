@@ -14,3 +14,6 @@ old/
 /test_data/test_bbox/
 /scripts/581681_punta_HR_stitch_merge_test.sh
 *.ipynb
+/__pycache__/
+*.cpython-311.pyc
+.gitignore
